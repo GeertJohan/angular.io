@@ -29,5 +29,10 @@
   "ts-to-js": {
     "title": "TypeScript to JavaScript",
     "intro": "Convert Angular 2 TypeScript examples into ES5 JavaScript"
+  },
+  
+  "rating-component": {
+    "title": "Rating Component",
+    "intro": "Learn how to write a rating component"
   }
 }
