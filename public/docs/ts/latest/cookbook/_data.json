@@ -19,5 +19,10 @@
   "dynamic-form": {
     "title": "Dynamic Form",
     "description": "Render dynamic forms with NgFormModel"
+  },
+  
+  "virtual-grid": {
+    "title": "Virtual Grid",
+    "description": "Scalable grid based on virtualization"
   }
 }
