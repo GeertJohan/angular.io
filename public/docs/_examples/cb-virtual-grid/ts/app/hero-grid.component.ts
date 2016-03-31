@@ -32,7 +32,7 @@ import {Row}                    from './row';
             </table>`
 })
 
-export class HeroGrid implements AfterViewChecked{
+export class HeroGridComponent implements AfterViewChecked{
 
   visibleRows:Array<Row> = [];
   heroGridService:HeroGridService;

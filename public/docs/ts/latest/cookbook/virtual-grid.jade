@@ -30,11 +30,11 @@ include ../_util-fns
 :marked
   ## Grid Component
   
-  The first step is to create a simple `HeroGrid` component with support for arrow key navigation and sorting.
+  The first step is to create a simple `HeroGridComponent` with support for arrow key navigation and sorting.
   
   `HeroGrid` defines the necessary template and binding logic to render the set of visible rows.
   
-+makeExample('cb-virtual-grid/ts/app/hero-grid.component.ts',null,'hero-grid.component.ts')(format='.')
++makeExample('cb-virtual-grid/ts/app/hero-grid.component.ts',null,'app/hero-grid.component.ts')(format='.')
 
 <a id="grid-component"></a>
 :marked
@@ -42,7 +42,7 @@ include ../_util-fns
 
 :marked
   Next we have defined `HeroGridService` to manage the entire set of rows and columns in the grid. `HeroGridService` controls the sliding window of currently visible rows. We will only render UI elements for visible rows. Based on user actions `HeroGridService` will recalculate the set of visible rows from the full dataset.
-+makeExample('cb-virtual-grid/ts/app/hero-grid.service.ts',null,'hero-grid.service.ts')(format='.') 
++makeExample('cb-virtual-grid/ts/app/hero-grid.service.ts',null,'app/hero-grid.service.ts')(format='.') 
 
 <a id="grid-sorting"></a>
 :marked
@@ -50,7 +50,7 @@ include ../_util-fns
 
 :marked
   We are doing the sorting in `HeroGridSortingService`.
-+makeExample('cb-virtual-grid/ts/app/hero-grid-sorting.service.ts',null,'hero-grid-sorting.service.ts')(format='.') 
++makeExample('cb-virtual-grid/ts/app/hero-grid-sorting.service.ts',null,'app/hero-grid-sorting.service.ts')(format='.') 
 
 <a id="object-model"></a>
 :marked
@@ -58,9 +58,9 @@ include ../_util-fns
 :marked
   The grid is bound to an object model consisting of `Row` and `Column` objects.  
   
-+makeExample('cb-virtual-grid/ts/app/row.ts',null,'row.ts')(format='.')    
++makeExample('cb-virtual-grid/ts/app/row.ts',null,'app/row.ts')(format='.')    
 
-+makeExample('cb-virtual-grid/ts/app/column.ts',null,'column.ts')(format='.')  
++makeExample('cb-virtual-grid/ts/app/column.ts',null,'app/column.ts')(format='.')  
 
 <a id="key-codes"></a>
 :marked
@@ -69,7 +69,7 @@ include ../_util-fns
 :marked
   The grid supports arrow key based navigation, so to map supported keys we have created `KeyCodeService`.
   
-+makeExample('cb-virtual-grid/ts/app/key-code.service.ts',null,'key-code.service.ts')(format='.')  
++makeExample('cb-virtual-grid/ts/app/key-code.service.ts',null,'app/key-code.service.ts')(format='.')  
 
 <a id="large-dataset"></a>
 :marked
@@ -79,7 +79,7 @@ include ../_util-fns
   We are getting the list of applicants from `HeroDataService`. Typically this data would come from a database, but for demo purposes we are using `HeroDataService` to simulate a large datset. Despite the large dataset we can see that the grid performs really well when sorting and paging through the data. 
   
   Paging through the data does not cause the grid to render more UI elements, so if we inspect the DOM we will see that the number of `tr` elements remains fixed. Instead we data-bind a sliding window of `Row` and `Column` objects to the same set of `tr` elements. Not increasing the number of rows to render is key to performance since DOM rendering is the slowest operation.
-+makeExample('cb-virtual-grid/ts/app/hero-data.service.ts',null,'hero-data.service.ts')(format='.')  
++makeExample('cb-virtual-grid/ts/app/hero-data.service.ts',null,'app/hero-data.service.ts')(format='.')  
 
 :marked
    The final grid looks like this:
