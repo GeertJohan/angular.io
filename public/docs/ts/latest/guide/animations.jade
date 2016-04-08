@@ -1,0 +1,156 @@
+include ../_util-fns
+
+:marked
+  ## Overview
+  
+  Motion is a key component in the design of modern web applications. We want our
+  user interfaces to have smooth transitions between states and engaging animations
+  that call attention where it's needed and make the UI a joy to use.
+  
+  Angular's animation system provides us what we need to make this happen. We can
+  define transitions and animations that run with native performance characterics
+  but still retain full control of timing and orchestration.
+  
+.alert.is-helpful
+  :marked
+    We can of course also use pure CSS animations as well as third-party libraries
+    to animate our Angular UIs. But for most things, we won't need to.
+    
+:marked
+  Animations are built into the Angular platform and can be defined for any component,
+  by first defining them in the component metadata and then attaching them in the
+  component's view.
+  
+.alert.is-helpful
+  :marked
+    Angular animations are built on top of the standard [Web Animations API](https://w3c.github.io/web-animations/)
+    and they run natively on [browsers that support it](http://caniuse.com/#feat=web-animation).
+    
+    A polyfill for other browsers is forthcoming.
+  
+:marked
+  ## Basic Transitions: Entering and Leaving The View
+  
+  An Angular animation is always attached to an *element* in a component's view.
+  What then gets animated is defined in terms of element **states** and **transitions**
+  between those states.
+  
+  An element can have any number of states and in the next section we will see
+  how to define them. But there are two special states that apply to *every* element:
+  
+  * The `void` state applies when the element is not attached to the view. It has
+    not yet been attached or it has been detached.
+  * The `*` ("any") state applies when the element *is* attached to a view. This is
+    a shorthand for saying "we don't care what state it's in, just that the element
+    is present"
+    
+  Using these two states we can define animation transitions that will apply when
+  an element enters or leaves the view:
+  
++makeExample('animations/ts/src/hero-list-basic.component.ts', 'animationdef')
+  
+:marked
+  We can then attach this animation to elements by using the `@animationName` syntax
+  in the component's template. Here the animation is attached to every element repeated
+  by the `ngFor`. Each one will animate to and from the view independently:
+  
++makeExample('animations/ts/src/hero-list-basic.component.ts', 'template')
+  
+  That's all we need to do to get some simple transitions going! Here's the full
+  component code:
+  
++makeExample('animations/ts/src/hero-list-basic.component.ts')
+  
+.alert.is-helpful
+  :marked
+    In this example we're using pixel (`px`) values for the translation offset.
+    Generally, when definin dimensional properties, we can use either strings with
+    the units included (e.g. `100px`, `2em`), or numbers, in which case the values
+    are assumed to be in pixels.
+    
+    See [here](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_animated_properties)
+    for a list of properties that can be animated.
+    
+:marked
+  ## Other State Transitions
+  
+  In addition to the `void` and `*` states, an element may have a number of specific
+  states. These are driven by the component code, and are applied by specifying an
+  expression as the value of the `@animation` attribute. In this example, the value
+  of the `hero.state` property becomes the animation state:
+  
++makeExample('animations/ts/src/hero-list-states.component.ts', 'template')
+
+:marked
+  We can then attach styles and transitions to these specific states in the
+  animation metadata:
+  
++makeExample('animations/ts/src/hero-list-states.component.ts', 'animationdef')
+  
+:marked
+  The `state()` definitions specify what the *end styles* of each state are.
+  They are applied to the element *as long as it remains in that state*. We
+  want the element to have a different background color and size as long as it
+  is active, not only *during* the animation.
+  
+  When we then define the transitions, we can refer to the styles already defined
+  in states using the `:state` syntax, so that we don't have to repeat the same
+  style rules again.
+   
+  ## Configuring Animation Timing
+  
+  In the preceding examples we've been defining the durations of our animations
+  as plain numbers. This is actually only one of the three ways in which an
+  animation duration can be defined:
+  
+  * As a plain number in milliseconds: `100`
+  * In a string, as milliseconds: `'100ms'`
+  * In a string, as seconds: `'0.1s'`
+  
+  We can also configure a *delay* and an *easing function* for each animation.
+  A delay controls how long to wait after the animation triggers before it is
+  actually started. We can define it by adding in a string after the duration.
+  It has the same format options as the duration:
+  
+  * Wait for 100ms and then run for 200ms: `'0.2s 100ms'`
+  
+  [Easing functions](http://easings.net/) control how the animation accelerates
+  and decelerates during its runtime. For example, using an `ease-in` function means
+  the animation begins slowly but then picks up speed towards the end. We can control
+  the easing by adding it as a *third* value in the string after the duration and the
+  delay (or as the *second* value when there is no delay):
+  
+  * Wait for 100ms and then run for 200ms, with easing: `'0.2s 100ms ease-out'`
+  * Run for 200ms, with easing: `'0.2s ease-in-out'`
+
+  Here are some custom timings in action:
+  
++makeExample('animations/ts/src/hero-list-timings.component.ts', 'animationdef')
+
+:marked
+  ## Multi-Step Animations
+  
+  More complex transitions, moving through intermediate styles. ("anticipation")
+  
+  TBD
+  
+  ## Parallel Animation Groups
+
+  Animating things at the same time but with different timings.
+  
+  TBD
+  
+  ## Accessing CSS Classes
+  
+  We can also specify animation styles by defining CSS class selectors in the 
+  [component styles](component-styles.html), and then referring to them
+  from the animation steps. This is often more convenient especially when
+  the animation has a more complex CSS configuration.
+  
+  TBD
+  
+  ## Accessing CSS Keyframes
+  
+  Pulling animation styles from @keyframes defined in component styles.
+  
+  TBD
