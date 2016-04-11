@@ -1,4 +1,3 @@
-// #docplaster
 // #docregion
 import { Component, OnInit } from 'angular2/core';
 import { Router } from 'angular2/router';
@@ -17,14 +16,17 @@ export class HeroesComponent implements OnInit {
   heroes: Hero[];
   selectedHero: Hero;
   addingHero = false;
+  error:any; 
 
   constructor(
     private _router: Router,
     private _heroService: HeroService) { }
 
   getHeroes() {
-    this._heroService.getHeroes()
-        .then(heroes => this.heroes = heroes);
+    this._heroService
+        .getHeroes()
+        .then(heroes => this.heroes = heroes)
+        .catch(error => this.error = error);//TODO: Display error message
   }
   
   addHero(){
@@ -35,11 +37,12 @@ export class HeroesComponent implements OnInit {
   // #docregion delete
   delete(hero:Hero, event:any){
     event.stopPropagation(); 
-    this._heroService.delete(hero)
-        .then(r => {
+    this._heroService
+        .delete(hero)
+        .then(res => {
           this.heroes = this.heroes.filter(h => h.id !== hero.id);
-        }
-    );
+        })
+        .catch(error => this.error = error);//TODO: Display error message
   }
   // #enddocregion delete
 

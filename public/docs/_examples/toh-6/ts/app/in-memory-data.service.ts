@@ -1,5 +1,5 @@
 // #docregion
-export class HeroData {
+export class InMemoryDataService {
   createDb() {
     let heroes = [
       { "id": 1, "name": "Windstorm" },

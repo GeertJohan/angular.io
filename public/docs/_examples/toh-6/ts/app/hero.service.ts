@@ -14,17 +14,16 @@ export class HeroService {
   
   //#docregion get-heroes
   getHeroes() {
-    return this._http.get(this._heroesUrl).toPromise()
-                     .then((res:Response) => res.json())
-                     .then(res => res.data)
-                     .catch(this._handleError);
+    return this._http
+               .get(this._heroesUrl).toPromise()
+               .then((res:Response) => res.json().data)
+               .catch(this._handleError);
   }
   //#enddocregion get-heroes
   
   getHero(id: number) {
-    return this.getHeroes().then(
-      heroes => heroes.filter((hero:Hero) => hero.id === id)[0]
-    );
+    return this.getHeroes()
+               .then(heroes => heroes.filter((hero:Hero) => hero.id === id)[0]);
   }
   
   //#docregion save
@@ -32,9 +31,7 @@ export class HeroService {
     if(hero.id){
       return this._put(hero);
     }
-    else{
-      return this._post(hero);
-    }
+    return this._post(hero);
   }
   //#enddocregion save
   
@@ -45,7 +42,9 @@ export class HeroService {
     
     let url = `${this._heroesUrl}/${hero.id}`;
     
-    return this._http.delete(url,headers).toPromise()
+    return this._http
+               .delete(url,headers)
+               .toPromise()
                .catch(this._handleError);
   }
   //#enddocregion delete-hero
@@ -55,9 +54,10 @@ export class HeroService {
     let headers = new Headers();
     headers.append('Content-Type', 'application/json');
     
-    return this._http.post(this._heroesUrl, JSON.stringify(hero), {headers:headers}).toPromise()
+    return this._http
+               .post(this._heroesUrl, JSON.stringify(hero), {headers:headers})
+               .toPromise()
                .catch(this._handleError);
-              
   }
   //#enddocregion post-hero 
   
@@ -68,7 +68,9 @@ export class HeroService {
     
     let url = `${this._heroesUrl}/${hero.id}`;
     
-    return this._http.put(url, JSON.stringify(hero), {headers:headers}).toPromise()
+    return this._http
+               .put(url, JSON.stringify(hero), {headers:headers})
+               .toPromise()
                .catch(this._handleError);
   }
   //#enddocregion put-hero
@@ -76,6 +78,7 @@ export class HeroService {
   //#docregion error-handler
   private _handleError(error:any){
     console.log('An error occurred:' + error);
+    return Promise.reject(error);
   }
   //#enddocregion error-handler 
 }

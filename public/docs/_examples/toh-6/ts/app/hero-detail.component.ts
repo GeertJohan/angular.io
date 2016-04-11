@@ -13,6 +13,7 @@ import { HeroService } from './hero.service';
 export class HeroDetailComponent implements OnInit {
   @Input() hero: Hero;
   @Output() updateHeroes = new EventEmitter();
+  error:any; 
 
   constructor(
     private _heroService: HeroService,
@@ -33,10 +34,12 @@ export class HeroDetailComponent implements OnInit {
   // #enddocregion ngOnInit
   // #docregion save
   save(){
-    this._heroService.save(this.hero)
-        .then(r => {
-          this.updateHeroes.emit(r);
-        });
+    this._heroService
+        .save(this.hero)
+        .then(response => {
+          this.updateHeroes.emit(response);
+        })
+        .catch(error => this.error = error);//TODO: Display error message
   }
   // #enddocregion save
   goBack() {

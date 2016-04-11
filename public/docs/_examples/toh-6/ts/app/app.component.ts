@@ -17,7 +17,7 @@ import { HTTP_PROVIDERS } from 'angular2/http';
 //These imports are only required for the in-memory web api 
 import { InMemoryBackendService, SEED_DATA } from 'a2-in-memory-web-api/core';
 import { XHRBackend } from 'angular2/http';
-import { HeroData } from './hero-data';
+import { InMemoryDataService } from './in-memory-data.service';
 
 @Component({
   selector: 'my-app',
@@ -40,7 +40,7 @@ import { HeroData } from './hero-data';
     
     // Only required for the in-memory web api 
     provide(XHRBackend, { useClass: InMemoryBackendService }), // in-mem server
-    provide(SEED_DATA,  { useClass: HeroData }) // in-mem server data
+    provide(SEED_DATA,  { useClass: InMemoryDataService }) // in-mem server data
   ]
 })
 //#enddocregion http
