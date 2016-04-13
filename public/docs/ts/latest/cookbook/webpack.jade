@@ -1,0 +1,360 @@
+include ../_util-fns
+
+:marked
+  Webpack is another common solution for creating new applications.
+  In this cookbook we will learn what is Webpack and how can we use it to create Angular 2 applications.
+  
+  <a id="top"></a>
+  ## Table of contents
+  
+  [What's Webpack?](#what-is-webpack)
+  
+    * [Entries and outputs](#entries-outputs)
+    * [Loaders](#loaders)
+    * [Plugins](#plugins)
+    
+  [Building our configuration](#building-config)
+  
+    * [Common settings](#common-settings)
+    * [Development settings](#development-settings)
+    * [Testing settings](#testing-settings)
+    * [Production settings](#production-settings)
+    
+  [Trying it out](#try)
+  
+  [Conclusions](#conclusions)
+    
+.l-main-section
+<a id="what-is-webpack"></a>
+:marked
+  ## What's Webpack?
+  
+  Webpack is a module bundler. It treats your project as a dependency graph, so you could have an `app.ts`
+  in your project that pulls in the dependencies that the project needs through standard `import` statements.
+  That includes your style and other assets too!
+  
+  Webpack does all the preprocessing for you and gives the bundles you specify through configuration.
+  This declarative approach is powerful, but difficult to learn.
+  
+<a id="entries-outputs"></a>
+:marked
+  ### Entries and outputs
+  
+  To create this dependency graph, we need to feed Webpack with one or more entry files. For example:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'one-entry')(format=".")
+  
+:marked
+  Webpack will use this `src/app.ts` as an entry point and it will traverse all its dependencies recursively.
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'app-example', 'src/app.ts')(format=".")
+
+:marked
+  In this case, Webpack will read `src/app.ts`, find an *import* statement  and recursively traverse
+  *angular2/core* to build the dependency graph.
+  
+  What now? We can now **output** a bundle file:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'one-output')(format=".")
+
+.l-sub-section
+  :marked
+    Each bundle that we output is a file that we will load via a &lt;script&gt; tag later.
+
+:marked
+  This `app.js` is a bundle that will contain our application with its dependencies. Just what we need!
+  
+  We can also split our application into app code and vendor code:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'two-entries')(format=".")
+
+:marked
+  With this setup, we can generate two bundle files.
+  One containing only our application code and another one with all the vendor dependencies.
+  Altough, to achieve that separation we need a plugin that we will cover later.
+  
+.l-sub-section
+  :marked
+    The `[name]` in the output is one of the many placeholders that Webpack has. This one will be replaced with the entry name.
+    `app` and `vendor` respectively.
+    
+<a id="loaders"></a>
+:marked
+  ### Loaders
+  
+  Of course, if we only needed to specify our inputs and outputs to make Webpack work, we wouldn't need a cookbook, right?
+  
+  With Webpack, we can import any kind of file and process it. That includes source files, CSS, images, html, fonts, ...
+  Of course, Webpack doesn't know what to do by default, so we need to teach it how to process those files. How? With loaders:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'loaders')(format=".")
+
+:marked
+  Thanks to that, you can do imports like:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'imports')(format=".")
+
+:marked
+  When Webpack finds an import statement, will test it against our loaders.
+  
+  In the first case, we are loading a `.ts` file and it matches our first loader so the import will be processed by the `ts` loader.
+  It won't match the second loader so that one is ignored. In our second case, it doesn't match the first loader but will match the second.
+  In this case, we have two loaders and will be applied from right to left. First the `css` loader that will process the css itself and then
+  the `style` loader that will grab that processed css and make it work within Webpack.
+  
+<a id="plugins"></a>
+:marked
+  ### Plugins
+  
+  With plugins, we can do everything we need. For example, we can do minification this easy:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'plugins')(format=".")
+
+:marked
+  We just need to invoke the plugins we need and they know when to do their magic.
+  
+<a id="building-config"></a>
+:marked
+  ## Building our configuration
+  
+  We are ready to build our own Webpack configuration for Angular 2. First, let's set up our development environment.
+  
+  Create a **new project folder**
+code-example(format="").
+  mkdir angular2-webpack
+  cd    angular2-webpack
+
+:marked
+  Create this next files:
+  
++makeTabs(
+  `cb-webpack/ts/package.1.json,
+  cb-webpack/ts/typings.json,
+  cb-webpack/ts/tsconfig.json,
+  cb-webpack/ts/webpack.config.js,
+  cb-webpack/ts/karma.conf.js,
+  cb-webpack/ts/config/helpers.js`,
+  null,
+  `package.json,
+  typings.json,
+  tsconfig.json,
+  webpack.config.js,
+  karma.conf.js,
+  config/helpers.js`
+)
+
+:marked
+  After we `npm install` our new dependencies, we are ready to start configuring.
+  
+.l-sub-section
+  :marked
+    Learn more about `tsconfig.json` and `typings.json` at the [Typescript configuration](../guide/typescript-configuration.html) chapter. Keep in mind that this cookbook overrides some values.
+  
+<a id="common-settings"></a>
+:marked
+  ### Common settings
+  
+  We want our configuration to work on development, testing and production. Since there are some common configuration
+  between those three environments, we are going to write it in a separate file.
+  
+  First, we need our entries:
+  
++makeExample('cb-webpack/ts/config/webpack.common.js', 'entries', 'config/webpack.common.js')(format=".")
+
+:marked
+  We are going to split our application in three bundles:
+  
+  * polyfills - es6-shim + Angular 2 polyfills.
+  * vendor - All the vendor files we need: Angular 2, lodash, bootstrap.css...
+  * app - Our application code, without dependencies.
+  
+.callout.is-critical
+  header Loading polyfills
+  p Make sure that you load angular2-polyfills before anything else (except the es6-shim). We need this polyfills to be the first &lt;script&gt; tag in our application. Otherwise, we could run outside a Zone and get no change detection.
+  
+:marked
+  Now we need our loaders:
+  
++makeExample('cb-webpack/ts/config/webpack.common.js', 'loaders', 'config/webpack.common.js')(format=".")
+
+:marked
+  * ts - Since our application is Typescript, we need a loader capable to transpile our Typescript code to ES5 using the `tsconfig.json` file.
+  * html - We need to be able to import our component's templates and use them.
+  * css - The first one is used for our application-wide styles. The second one is used to import our component's styles.
+  
+  In the first `css` loader we explicitly exclude all the `.css` files at `/src/app` because there is where our component's styles will sit.
+  We will talk more about `ExtractTextPlugin` in the next section, but for now, we are happy to know that it will use the `style` and `css` loader for us.
+  The second `css` loader will be used for those component's styles and we will use the `raw` loader with them. This loader returns the content of a file as a string,
+  and that is exactly what a component is expecting.
+  
+  In an earlier snippet we saw:
+  
++makeExample('cb-webpack/ts-snippets/webpack.config.snippets.js', 'single-import')(format=".")
+
+:marked
+  We are going to import dozens if not hundreds of Typescript files, it would be better if we could ignore the extension when doing some imports.
+  
++makeExample('cb-webpack/ts/config/webpack.common.js', 'resolve', 'config/webpack.common.js')(format=".")
+
+:marked
+  With this, we instruct Webpack that we could omit the extension for `.js` and `.ts`
+  
+.l-sub-section
+  :marked
+    We can add more extensions there, for `.css`, `.html`... depend in how explicit we want our imports to be.
+    
+:marked
+  To finish this common settings, we will add two plugins:
+  
++makeExample('cb-webpack/ts/config/webpack.common.js', 'plugins', 'config/webpack.common.js')(format=".")
+
+:marked
+  We want our `app` chunk to contain only app code and `vendor` to contain all the vendors. Webpack is not smart
+  enough to do it by itself, but we can use the `CommonsChunkPlugin` to do the job. Here it will set a hierarchy between those three
+  chunks: `app -> vendor -> polyfills`. If Webpack finds that `app` has shared dependencies with `vendor`, it will remove them from `app`.
+  Same happens with `vendor` and `polyfills` but in this case there are no shared dependencies.
+  
+.l-sub-section
+  :marked
+    A chunk is a piece of your application. Since we splitted it in three parts, we have three chunks.
+    
+:marked
+  With our configuration, we will generate a bunch of js and css files. We can either put as many &lt;script&gt; tags as needed or let
+  Webpack inject those tags for us. That is exactly what `HtmlWebpackPlugin` does.
+  
+  Here is the entire file:
+  
++makeExample('cb-webpack/ts/config/webpack.common.js', null, 'config/webpack.common.js')(format=".")
+  
+<a id="development-settings"></a>
+:marked
+  ### Development settings
+  
+  With all the heavy lifting done in the common file, the development settings are pretty simple:
+  
++makeExample('cb-webpack/ts/config/webpack.dev.js', null, 'config/webpack.dev.js')(format=".")
+
+:marked
+  We configure the Webpack dev server, we put sourcemaps support and we output or bundles into a `dist` folder. The `HtmlWebpackPlugin`
+  will use the *publicPath* and the *filename* to generate the &lt;script&gt; tags.
+  
+  By default, all our CSS will be bundled inside our Javascript bundles, but using the `ExtractTextPlugin` we can extract them into a
+  proper `.css` file. The `HtmlWebpackPlugin` will take care of that as well.
+  
+.l-sub-section
+  :marked
+    You will realize that your application works but there are no files at the `dist` folder. Webpack dev server doesn't write into disk, is all in memory.
+  
+:marked
+  Grab the app code at the end of this cookbook and try it:
+  
+code-example(format="").
+  npm start
+
+<a id="testing-settings"></a>
+:marked
+  ### Testing settings
+  
+  For testing we are going to disable the loaders and plugins that we don't need. For example, we don't need to load our `css` since
+  that would significantly slow down our tests. We have two options: override the options we don't need or create a brand new config file:
+  
++makeExample('cb-webpack/ts/config/webpack.test.js', null, 'config/webpack.test.js')(format=".")
+
+:marked
+  That is the only configuration we need. Notice how we used the `null` loader for the CSS.
+  
+  Karma config:
+  
++makeExample('cb-webpack/ts/config/karma.conf.js', null, 'config/karma.conf.js')(format=".")
+
+:marked
+  The interesting part here is that karma will use webpack to run our tests. That is great because we don't need to worry about
+  transpiling or anything. Webpack will transpile our Typescript files in memory and feed it directly to karma. No temporary files.
+  
+  Although, instead of feeding all our source code and tests to karma, we do it differently:
+  
++makeExample('cb-webpack/ts/config/spec-bundle.js', null, 'config/spec-bundle.js')(format=".")
+
+:marked
+  We tell Webpack to find any file that ends with `.spec.ts` and load them. Each spec file will import all the source they need
+  so at the end everything you need is loaded.
+  
+:marked
+  Grab the app code at the end of this cookbook and try it:
+  
+code-example(format="").
+  npm test
+  
+<a id="production-settings"></a>
+:marked
+  ### Production settings
+  
+  Building production builds with Webpack is really easy to do:
+  
++makeExample('cb-webpack/ts/config/webpack.prod.js', null, 'config/webpack.prod.js')(format=".")
+
+:marked
+  We have our output like we had in development, but this time it will generate our bundles with a hash for cache-bust. Thanks to `HtmlWebpackPlugin`
+  we don't need to worry about updating an `index.html` file when the hashes changes.
+  
+  For plugins, we use a few:
+  
+  * NoErrorsPlugin - Stops the build if there is any error.
+  * DedupePlugin - Search for equal or similar files and deduplicate them in the output.
+  * UglifyJsPlugin - Minimize our bundles.
+  * ExtractTextPlugin - Same thing as development but will add the cache-bust hash as well.
+  * DefinePlugin - Allows us to define variables that we can use in our code.
+  
+  We defined an `ENV` variable at top and then we allow it to be used in our code. Thanks to that we can enable the production mode like:
+  
++makeExample('cb-webpack/ts/src/bootstrap.ts', 'enable-prod')(format=".")
+  
+:marked
+  Grab the app code at the end of this cookbook and try it:
+  
+code-example(format="").
+  npm run build
+  
+<a id="try"></a>
+:marked
+  ## Trying it out
+  
+  Our Webpack configuration is done, we just need to put some code to try it out:
+  
++makeTabs(
+  `cb-webpack/ts/src/vendor.ts,
+  cb-webpack/ts/src/bootstrap.ts,
+  cb-webpack/ts/src/app/app.component.ts,
+  cb-webpack/ts/src/app/app.component.html,
+  cb-webpack/ts/src/app/app.component.css,
+  cb-webpack/ts/src/app/app.component.spec.ts,
+  cb-webpack/ts/src/index.html,
+  cb-webpack/ts/src/styles.css`,
+  null,
+  `src/vendor.ts,
+  src/bootstrap.ts,
+  src/app/app.component.ts,
+  src/app/app.component.html,
+  src/app/app.component.css,
+  src/app/app.component.spec.ts,
+  src/index.html,
+  src/styles.css`
+)
+
+:marked
+  The interesting bits are:
+  
+  * We import all our vendor dependencies at `vendor.ts` so the `CommonsChunkPlugin` can remove those vendors from our app code.
+  * To load external html and css we use `require()`. That way those html and css will end in our final bundle.
+  * We import our app's css with a simple `import`.
+  * No &lt;script&gt; tag in `index.html`, we have `HtmlWebpackPlugin`, remember?
+  
+<a id="conclusions"></a>
+:marked
+  ## Conclusions
+  
+  Webpack configuration is a bit opinionated but not really complicated. With a small configuration we managed to have development, test and production.
+  
+  There are a couple of extra things you could do yourself like adding `scss` or images support. Hint hint, they are just another loader.
+  
+  [Back to top](#top)
