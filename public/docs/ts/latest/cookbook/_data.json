@@ -25,6 +25,11 @@
     "title": "Dynamic Form",
     "intro": "Render dynamic forms with NgFormModel"
   },
+  
+  "tree-view": {
+    "title": "Tree View",
+    "intro": "Creating a recursive tree view"
+  },
 
   "ts-to-js": {
     "title": "TypeScript to JavaScript",
