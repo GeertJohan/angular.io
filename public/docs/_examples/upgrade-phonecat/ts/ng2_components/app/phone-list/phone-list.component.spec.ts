@@ -1,0 +1,55 @@
+// #docregion
+import {provide} from 'angular2/core';
+import {HTTP_PROVIDERS} from 'angular2/http';
+import {Observable} from 'rxjs/Rx';
+import 'rxjs/add/observable/fromArray';
+import {
+  describe,
+  beforeEachProviders,
+  injectAsync,
+  it,
+  expect,
+  TestComponentBuilder
+} from 'angular2/testing';
+import PhoneList from './phone-list.component';
+import {Phone, PhoneData} from '../core/phone/phone.service';
+
+class MockPhone extends Phone {
+  query():Observable<PhoneData[]> {
+    return Observable.fromArray([
+      [
+        {name: 'Nexus S', snippet: '', images: []},
+        {name: 'Motorola DROID', snippet: '', images: []}
+      ]
+    ])
+  }
+}
+
+describe('PhoneList', () => {
+
+  beforeEachProviders(() => [
+    provide(Phone, {useClass: MockPhone}),
+    HTTP_PROVIDERS
+  ]);
+
+  it('should create "phones" model with 2 phones fetched from xhr',
+      injectAsync([TestComponentBuilder], (tcb) => {
+    return tcb.createAsync(PhoneList).then((fixture) => {
+      fixture.detectChanges();
+      let compiled = fixture.debugElement.nativeElement;
+      expect(compiled.querySelectorAll('.phone-listing').length).toBe(2);
+      expect(compiled.querySelector('.phone-listing:nth-child(1)').textContent).toContain('Nexus S');
+      expect(compiled.querySelector('.phone-listing:nth-child(2)').textContent).toContain('Motorola DROID');
+    });
+  }));
+
+  it('should set the default value of orderProp model',
+      injectAsync([TestComponentBuilder], (tcb) => {
+    return tcb.createAsync(PhoneList).then((fixture) => {
+      fixture.detectChanges();
+      let compiled = fixture.debugElement.nativeElement;
+      expect(compiled.querySelector('select option:last-child').selected).toBe(true);
+    });
+  }));
+
+});

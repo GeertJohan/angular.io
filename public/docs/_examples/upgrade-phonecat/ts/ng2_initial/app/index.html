@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <title>Google Phone Gallery</title>
   <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.css">
-  <link rel="stylesheet" href="css/app.css">
-  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="app.animations.css">
   <!-- #docregion scripts -->
   <script src="../node_modules/systemjs/dist/system.src.js"></script>
   <script src="bower_components/jquery/dist/jquery.js"></script>
@@ -15,7 +15,6 @@
   <script src="bower_components/angular-resource/angular-resource.js"></script>
   <!-- #docregion ng2 -->
   <script src="../node_modules/es6-shim/es6-shim.js"></script>
-  <script src="../node_modules/es6-promise/dist/es6-promise.js"></script>
   <script src="../node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
   <script src="../node_modules/angular2/bundles/angular2-polyfills.js"></script>
   <script src="../node_modules/angular2/bundles/angular2.dev.js"></script>
@@ -25,18 +24,18 @@
   <script src="../node_modules/rxjs/bundles/Rx.js"></script>
   <script src="../node_modules/angular2/bundles/http.dev.js"></script>
   <!-- #enddocregion ng2-http -->
-  <!-- #docregion systemconfig -->
+  <!-- #docregion ng2 -->
   <script>
     System.config({
       packages: {
-        'js': {
-          defaultExtension: 'js'
-        }
+        'angular2': {defaultExtension: false},
+        'rxjs': {defaultExtension: false},
+        '.': {defaultExtension: 'js'}
       }
     });
-    System.import('js/app.module');
+    System.import('./app.module');
   </script>
-  <!-- #enddocregion systemconfig -->
+  <!-- #enddocregion ng2 -->
   <!-- #enddocregion scripts -->
 </head>
 <body>
