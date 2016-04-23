@@ -12,8 +12,9 @@ import { HeroService } from './hero.service';
 })
 export class HeroDetailComponent implements OnInit {
   @Input() hero: Hero;
-  @Output() updateHeroes = new EventEmitter();
-  error:any; 
+  @Output() close = new EventEmitter();
+  error: any;
+  navigated = false; // true if navigated here
 
   constructor(
     private _heroService: HeroService,
@@ -22,28 +23,31 @@ export class HeroDetailComponent implements OnInit {
 
   // #docregion ngOnInit
   ngOnInit() {
-    if(this._routeParams.get('id') !== null){
+    if (this._routeParams.get('id') !== null) {
       let id = +this._routeParams.get('id');
+      this.navigated = true;
       this._heroService.getHero(id)
           .then(hero => this.hero = hero);
-    }
-    else{
+    } else {
+      this.navigated = false;
       this.hero = new Hero();
     }
   }
   // #enddocregion ngOnInit
   // #docregion save
-  save(){
+  save() {
     this._heroService
         .save(this.hero)
-        .then(response => {
-          this.updateHeroes.emit(response);
+        .then(hero => {
+          this.hero = hero; // saved hero, w/ id if new
+          this.goBack(hero);
         })
-        .catch(error => this.error = error);//TODO: Display error message
+        .catch(error => this.error = error); // TODO: Display error message
   }
   // #enddocregion save
-  goBack() {
-    window.history.back();
+  goBack(savedHero: Hero = null) {
+    this.close.emit(savedHero);
+    if (this.navigated) { window.history.back(); }
   }
 }
 

@@ -55,40 +55,118 @@ code-example(format="." language="bash").
 :marked
   The application runs and updates automatically as we continue to build the Tour of Heroes.
 
+.l-main-section  
+:marked
+ ## Prepare for Http
+  
+  `Http` is ***not*** a core Angular module. 
+  It's Angular's optional approach to web access and it exists as a separate add-on module called `angular2/http`,
+  shipped in a separate script file as part of the Angular npm package. 
+  Add that script to `index.html` somewhere below the main angular script.
+  
++makeExample('toh-6/ts/index.html', 'http', 'index.html (http)')(format=".")  
+:marked
+  ### Enable rxjs Observable operators
+  The `http` methods return `Observable` streams implemented with the
+  <a href="https://github.com/ReactiveX/rxjs/blob/master/README.md" target="_blank">rxjs library</a>.
+  
+  We've been loading that library in `index.html` since day one although we've had no reason to talk about it before. 
++makeExample('toh-6/ts/index.html', 'rxjs')(format=".")  
+:marked
+  We'll be using observable operators to process `http` data from the server. 
+  It's time to enable access to the rxjs operators. Open `main.ts` and add this line to the imports section:
++makeExample('toh-6/ts/app/main.ts', 'rxjs', 'app/main.ts (rxjs)')(format=".")  
+:marked
+  ### Register (provide) *http* services
+  Our app will depend upon the `http` service which itself depends upon other supporting services.
+  The `HTTP_PROVIDERS` array from `angular2/http` holds the complete set of services.
+  We register these services with the top-level component to make them *injectable* any where in the application
+  by importing the `HTTP_PROVIDERS` array and providing it to `AppComponent` like this:
+
++makeExample('toh-6/ts/app/app.component.ts', 'http', 'app/app.component (excerpt)')(format=".")
+
+.l-main-section
+:marked
+  ## Simulating the web api
+  Our hero api is not deployed to production yet. 
+  We don't have a web server that can handle requests for heroes.
+  Until we do, *we'll fake it* with the help of the *in-memory web api* module.
+  
+.alert.is-helpful
+  :marked
+    The *in-memory web api* is useful in the early stages of development and for demonstrations such as this Tour of Heroes. 
+    Skip it when you have a real web api server.
+    
+    Learn more about the *in-memory web api* in the [Http chapter](../guide/server-communication.html#!#in-mem-web-api).
+:marked
+  Please blindly follow along with the example and add the following imports and providers:
++makeExample('toh-6/ts/app/app.component.ts', 'web-api', 'app/app.component (excerpt - web api)')(format=".")  
+:marked
+  We're priming the fake web api with hero data from the following `in-memory-data.service.ts` file which we add to our project:
++makeExample('toh-6/ts/app/in-memory-data.service.ts', null, 'app/in-memory-data.service.ts')(format=".")  
+:marked
+  This file replaces `mock-heroes.ts` which is safe to delete.
+
 .l-main-section
 :marked
   ## Heroes and Http
   
-  Let's look back at our `HeroService` implementation in the <a href="/docs/ts/latest/tutorial/toh-pt4.html">services</a> chapter. Specifically let's revisit the point we made about using promises when loading heroes. 
+  Look at our current `HeroService` implementation
++makeExample('toh-4/ts/app/hero.service.ts', 'get-heroes', 'app/hero.service.ts (getHeroes - old)')(format=".")
+:marked
+  We returned a promise resolved with mock heroes. 
+  It may have seemed like overkill at the time, but we were anticipating the
+  day when we fetched heroes with Http and we knew that would be an asynchronous operation.
   
-  Wrapping a simple constant in a promise might have seemed like overkill at the time, but we will show why this was an important first step towards moving to `Http`. 
-  
-  Let's get started by converting `getHeroes()` to use `Http`.
+  That day has arrived! Let's convert `getHeroes()` to use `Http`:
   
 +makeExample('toh-6/ts/app/hero.service.ts', 'get-heroes', 'app/hero.service.ts (getHeroes using Http)')(format=".")
   
 :marked
   ### Http Promise
 
-  In our previous implementation we created a promise ourselves and resolved it immediately. When using `Http` we no longer have to create the promise manually. Instead `Http` will create it for us, but we have to call `toPromise()` to get it.
-  
-  In the `then` we convert the response to a json object by calling `res.json()`.
-  
-  Our api follows the convention of returning the result wrapped in a `data` property, but we don't want to expose this to the caller, so we flatten the response by returning `res.data`.   
+  We're still returning a promise but we're creating it differently.
+  The Angular `http.get` returns an `Observable` (more on that soon). 
+  We immediately convert it to a promise so that we are back on familiar ground.
++makeExample('toh-6/ts/app/hero.service.ts', 'to-promise')(format=".")
+:marked
+  In the `then` callback we call the `json` method of the http `response` to extract the
+  data within the response as a JSON object.
++makeExample('toh-6/ts/app/hero.service.ts', 'to-promise')(format=".")
+:marked
+  That JSON object has a single `data` property that holds the array of *heroes* that the service caller really wants.
+  So we grab that array and return it as the resolved promise value.
 
+.alert.is-important
+  :marked
+    Pay close attention to the shape of the data returned by the server.
+    This particular *in-memory web api* example happens to return an object with a `data` property.
+    Your api might return something else.
+    
+    Adjust the code to match *your web api*. 
+    The caller need never know of these low-level details.
+:marked
+  The caller receives a promise of *heroes* as it did before and has no idea that we're now able to
+  fetch heroes over the wire.
 :marked
   ### Error Handling
   
-  At the end we are calling `catch` and passing in an error handler. This is an important step since it allows us to catch any error returned by the api. In the service we log the error and return the rejected promise. It's important that the service returns the rejected promise to the component, so that we can display an error message to the user.   
-+makeExample('toh-6/ts/app/hero.service.ts', 'error-handler', 'app/hero.service.ts (Error handler)')(format=".")
-
+  At the end of `getHeroes` we `catch` server failures and pass them to an error handler:
++makeExample('toh-6/ts/app/hero.service.ts', 'catch')(format=".")
 :marked
-  ### Promises are Promises
-  Even though we made significant internal changes to `getHeroes()`, the public signature did not change. Like before we are returning a promise, so the callers of `getHeroes()` will not need to be updated.  
+  This is a critical step! 
+  We must anticipate http failures as they happen frequently for reasons beyond our control.
 
-.l-sub-section
-  :marked
-    We realize there are alternatives to promises for processing http calls. We will encounter other approaches such as Observables in subsequent chapters, but for the purposes of this article we are sticking to promises. 
++makeExample('toh-6/ts/app/hero.service.ts', 'error-handler', 'app/hero.service.ts (Error handler)')(format=".")
+:marked
+  In this demo service we log the error to the console; we should do better in real life.
+
+  We've also decided to return a user friendly form of the error to
+  to the caller in a rejected promise so that the caller can display a proper error message to the user.
+  
+  ### Promises are Promises
+  Although we made significant *internal* changes to `getHeroes()`, the public signature did not change. 
+  We still return a promise. We won't have to update any of the components that call `getHeroes()`.
 
 .l-main-section   
 :marked
@@ -180,29 +258,6 @@ figure.image-display
   
 figure.image-display
   img(src='/resources/images/devguide/toh/heroes-list-delete-button.png' alt="Heroes List With Delete Button")  
-
-.l-main-section  
-:marked
- ## Integration with Http
-  
-  `Http` is not part of the Angular core module, but exists as a separate add-on module called `angular2/http`. It ships as a separate bundle, so we have to include the bundle in `index.html`.
-  
-+makeExample('toh-6/ts/index.html', 'http', 'index.html (http)')(format=".")  
-  
-:marked
-  The only other thing we have to do is import `HTTP_PROVIDERS` from `angular2/http` and register it in `AppComponent`'s provider array.   
-  
-+makeExample('toh-6/ts/app/app.component.ts', 'http', 'app/app.component (http)')(format=".")  
-
-:marked
-  ### Simulating the api
-  Our hero api is not deployed to production yet, but for the purposes of this chapter we have decided to integrate with an in-memory web api.
-  
-  Looking at the `AppComponent` we notice that we have also imported `InMemoryBackendService`, `InMemoryDataService` and `SEED_DATA`. These imports are only there to configure the in-memory web api and will not be needed when integrating with a real api.
-  
-  We have included some more information about configuring the in-memory web api <a href='/docs/ts/latest/guide/server-communication.html#!#in-mem-web-api'>here</a>.
-  
-  Since we are integrating with the in-memory web api we no longer need `mock-heroes.ts`, so it's safe to delete it.
 
 :marked
   ### Review the App Structure

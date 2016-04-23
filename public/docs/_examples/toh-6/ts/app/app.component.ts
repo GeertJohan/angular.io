@@ -10,16 +10,21 @@ import { HeroDetailComponent } from './hero-detail.component';
 
 import { provide } from 'angular2/core';
 
-//#docregion http
-//Required import for Http in general
+// #docregion http
 import { HTTP_PROVIDERS } from 'angular2/http';
+// #enddocregion http
 
-//These imports are only required for the in-memory web api 
+// #docregion web-api
+// These imports are only required for the in-memory web api
 import { InMemoryBackendService, SEED_DATA } from 'a2-in-memory-web-api/core';
 import { XHRBackend } from 'angular2/http';
 import { InMemoryDataService } from './in-memory-data.service';
+// #docregion http
 
 @Component({
+   // ...
+// #enddocregion http
+// #enddocregion web-api
   selector: 'my-app',
 
   template: `
@@ -32,18 +37,26 @@ import { InMemoryDataService } from './in-memory-data.service';
   `,
   styleUrls: ['app/app.component.css'],
   directives: [ROUTER_DIRECTIVES],
+// #docregion http, web-api
   providers: [
-    ROUTER_PROVIDERS, 
+    // ...
+// #enddocregion http, web-api
+    ROUTER_PROVIDERS,
     HeroService,
-    
-    HTTP_PROVIDERS, //Required registration of HTTP_PROVIDERS 
-    
-    // Only required for the in-memory web api 
+
+// #docregion http
+    HTTP_PROVIDERS, // Required registration of HTTP_PROVIDERS
+// #enddocregion http
+
+// #docregion web-api
+    // Only required for the in-memory web api
     provide(XHRBackend, { useClass: InMemoryBackendService }), // in-mem server
     provide(SEED_DATA,  { useClass: InMemoryDataService }) // in-mem server data
+// #enddocregion web-api
+// #docregion http, web-api
   ]
 })
-//#enddocregion http
+// #enddocregion http, web-api
 @RouteConfig([
   {
     path: '/dashboard',
