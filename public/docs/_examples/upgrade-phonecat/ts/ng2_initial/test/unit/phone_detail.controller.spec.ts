@@ -1,9 +1,7 @@
 // #docregion
-import {Observable} from 'rxjs/Rx';
+import { Observable } from 'rxjs/Rx';
 import '../../app/js/phone_detail/phone_detail.module';
-import {Phones} from '../../app/js/core/phones.service';
-
-import 'rxjs/add/observable/fromArray';
+import { Phones } from '../../app/js/core/phones.service';
 
 describe('PhoneDetailCtrl', () => {
   var scope, phones, $controller,
@@ -33,7 +31,7 @@ describe('PhoneDetailCtrl', () => {
 
 
   it('should fetch phone detail', function() {
-    spyOn(phones, 'get').and.returnValue(Observable.fromArray([xyzPhoneData()]));
+    spyOn(phones, 'get').and.returnValue(Observable.of(xyzPhoneData()));
 
     let ctrl = $controller('PhoneDetailCtrl', {$scope: scope});
 

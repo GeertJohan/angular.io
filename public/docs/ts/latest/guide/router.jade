@@ -1,4 +1,10 @@
 include ../_util-fns
+.alert.is-critical
+  :marked
+    This chapter is a *work in progress*.
+    
+    It describes the *release candidate* Component Router which
+    replaces the [*beta* router](router-deprecated.html).
 
 :marked
   The Angular ***Component Router*** enables navigation from one [view](./glossary.html#view) to the next
@@ -34,16 +40,17 @@ include ../_util-fns
     
   We'll learn many router details in this chapter which covers
 
-  * loading the [router library](#load-library) and setting the [base href](#base-href)
+  * setting the [base href](#base-href)
+  * importing from the [router library](#import)
   * [configuring a router](#route-config)
   * the [link parameters array](#link-parameters-array) that propels router navigation
   * navigating when the user clicks a data-bound [RouterLink](#router-link)
   * navigating under [program control](#navigate)
-  * embedding critical information in the URL with [route parameters](#route-parameters)
+  * embedding critical information in the URL with [positional parameters](#positional-parameters)
   * creating a [child router](#child-router) with its own routes
   * setting a [default route](#default)
   * confirming or canceling navigation with [router lifecycle hooks](#lifecycle-hooks)
-  * passing optional information in [query parameters](#query-parameters)
+  * passing optional information in [matrix parameters](#matrix-parameters)
   * choosing the "HTML5" or "hash" [URL style](#browser-url-styles)
 
   We proceed in phases marked by milestones building from a simple two-pager with placeholder views
@@ -56,22 +63,23 @@ include ../_util-fns
   ## The Basics
   Let's begin with a few core concepts of the Component Router.
   Then we can explore the details through a sequence of examples.
-  ### Setup
-  The Angular Component Router is an optional service that presents a particular component view for a given URL.
-  It is not part of the Angular 2 core. It is in its own library 
-  within the Angular npm bundle.
-  We make it available by loading its script in our `index.html`, after
-  the Angular core script.
-+makeExample('router/ts/index.html','router-lib')(format=".")
+
 :marked
   ### *&lt;base href>*
-  Most routing applications should add a `<base>` element just after the  `<head>` tag
+  Most routing applications should add a `<base>` element to the **`index.html`** just after the  `<head>` tag
   to tell the router how to compose navigation URLs.
 
   If the `app` folder is the application root, as it is for our sample application,
   set the `href` value *exactly* as shown here.
++makeExample('router/ts/index.1.html','base-href', 'index.html (base href)')(format=".")
 
-+makeExample('router/ts/index.html','base-href')(format=".")
+:marked
+  ### Router imports
+  The Angular Component Router is an optional service that presents a particular component view for a given URL.
+  It is not part of the Angular 2 core. It is in its own library package, `@angular/router`.
+  We import what we need from it as we would from any other Angular package.
+
++makeExample('router/ts/app/app.component.1.ts','import-router', 'app/app.component.ts (import)')(format=".")
 .l-sub-section
   :marked
     We cover other options in the [details below](#browser-url-styles).
@@ -275,18 +283,8 @@ figure.image-display
   Let's begin with a simple version of the app that navigates between two empty views.
 figure.image-display
   img(src='/resources/images/devguide/router/router-1-anim.gif' alt="App in action" )
-:marked
-  <a id="load-library"></a>
-  ### Load the Component Router library
-  The Component Router is not part of the Angular 2 core. It is in its own library.
-  The router is an optional service because not all applications need routing and,
-  depending on your requirements, you may need a different routing library.
 
-  The Component Router library is part of the Angular npm bundle.
-  We make it available by loading its script in our `index.html`, right after
-  the Angular core script.
 <a id="base-href"></a>
-+makeExample('router/ts/index.html','router-lib')(format=".")
 :marked
   <a id="base-href"></a>
   ### Set the *&lt;base href>*
@@ -305,9 +303,9 @@ figure.image-display
 
   Add the base element just after the  `<head>` tag.
   If the `app` folder is the application root, as it is for our application,
-  set the `href` value *exactly* as shown here.
+  set the `href` value in **`index.html`** *exactly* as shown here.
 
-+makeExample('router/ts/index.html','base-href')(format=".")
++makeExample('router/ts/index.1.html','base-href', 'index.html (base href)')(format=".")
 .l-sub-section
   :marked
     HTML 5 style navigation is the Component Router default.
@@ -325,6 +323,18 @@ figure.image-display
     &lt;script>document.write('&lt;base href="' + document.location + '" />');&lt;/script>
   :marked
     We should only need this trick for the live example, not production code.
+
+<a id="import"></a>
+:marked
+  ### Import from the Component Router library
+  The Component Router is not part of the Angular 2 core. It is in its own library.
+  The router is an optional service because not all applications need routing and,
+  depending on your requirements, you may need a different routing library.
+
+  The Component Router library is in its own `@angular/router` package.
+  We import what we need from it as we would from any Angular package:
++makeExample('router/ts/app/app.component.1.ts','import-router', 'app/app.component.ts (import)')(format=".")
+
 :marked
   ### Booting with the router service providers
   Our app launches from the `main.ts` file in the `/app` folder so let's start there.
@@ -594,7 +604,7 @@ code-example(format="." language="bash").
   This array is similar to the  *link parameters array* we met [earlier](#shell-template) in an anchor tag while
   binding to the `RouterLink` directive. This time we see it in code rather than in HTML.
   
-  <a id="route-parameters"></id>
+  <a id="positional-parameters"></id>
   ### Setting the route parameters object
 
   We're navigating to the `HeroDetailComponent` where we expect to see the details of the selected hero.
@@ -1003,13 +1013,13 @@ code-example(format="").
   `)
 
 
-<a id="query-parameters"></a>
+<a id="matrix-parameters"></a>
 <a id="query-parameter"></a>
 .l-main-section
 :marked
   ## Milestone #4: Query Parameters
   
-  We use [*route parameters*](#route-parameters) to specify a *required* parameterized value *within* the route URL
+  We use [*route parameters*](#positional-parameters) to specify a *required* parameterized value *within* the route URL
   as we do when navigating to the `HeroDetailComponent` in order to view-and-edit the hero with *id:15*.
 code-example(format="." language="bash").
   localhost:3000/hero/15
@@ -1050,7 +1060,7 @@ figure.image-display
   * the value is optional.
   * the value is complex and/or multi-variate.  
   
-  <a id="route-parameters-object"></a>
+  <a id="positional-parameters-object"></a>
   ### Route parameters object
   When navigating to the `HeroDetailComponent` we specified the `id` of the hero-to-edit in the 
   *route parameters object* and made it the second item of the [*link parameters array*](#link-parameters-array). 
@@ -1118,7 +1128,7 @@ code-example(format="." language="bash").
   First we extend the router import statement to include the `RouteParams` service symbol;
 +makeExample('router/ts/app/heroes/hero-list.component.ts','import-route-params', 'hero-list.component.ts (import)')(format=".")
 :marked
-  Then we extend the constructor to inject the `RouteParams` service and extract the `id` parameter as the `_selectedId`:
+  Then we extend the constructor to inject the `RouteParams` service and extract the `id` parameter as the `selectedId`:
 +makeExample('router/ts/app/heroes/hero-list.component.ts','ctor', 'hero-list.component.ts (constructor)')(format=".")
 .l-sub-section
   :marked
@@ -1336,20 +1346,6 @@ code-example(format="." language="bash").
   If we wanted to, we could redefine our `AppComponent` template with *Crisis Center* routes exclusively:
 +makeExample('router/ts/app/app.component.3.ts', 'template')(format=".")
 :marked
-  ### Link Parameters Arrays in Redirects
-  What if we weren't constructing anchor tags with `RouterLink` directives?
-  What if we wanted to add a disaster route as part of the top-level router's configuration?
-
-  We can do that!
-
-  We compose a 3-item link parameters array following the recipe we just created.
-  This time we set the id to the *Asteroid Crisis* (`{id:3}`).
-
-  We can't define a normal route because that requires setting a target component.
-  We're not defining a *route to a component*. We're defining a *route to a route*. A *route to a route* is a **redirect**.
-  Here's the redirect route we'll add to our configuration.
-+makeExample('router/ts/app/app.component.ts', 'asteroid-route')(format=".")
-:marked
   In sum, we can write applications with one, two or more levels of routing.
   The link parameters array affords the flexibility to represent any routing depth and
   any legal sequence of route names and (optional) route parameter objects.
@@ -1453,7 +1449,7 @@ code-example(format=".", language="bash").
   The preferred way to configure the strategy is to add a
   [&lt;base href> element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) tag
   in the `<head>` of the `index.html`.
-+makeExample('router/ts/index.html','base-href')(format=".")
++makeExample('router/ts/index.1.html','base-href')(format=".")
 :marked
   Without that tag, the browser may not be able to load resources
   (images, css, scripts) when "deep linking" into the app.

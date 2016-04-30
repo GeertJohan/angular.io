@@ -1,21 +1,20 @@
-import {provide} from 'angular2/core';
+import { provide } from '@angular/core';
 // #docregion routeparams
-import {RouteParams} from 'angular2/router';
+import { RouteParams } from '@angular/router';
 // #enddocregion routeparams
-import {HTTP_PROVIDERS} from 'angular2/http';
-import {Observable} from 'rxjs/Rx';
-import 'rxjs/add/observable/fromArray';
-
+import { HTTP_PROVIDERS } from '@angular/http';
+import { Observable } from 'rxjs/Rx';
 import {
   describe,
   beforeEachProviders,
-  injectAsync,
+  inject,
   it,
-  expect,
-  TestComponentBuilder
-} from 'angular2/testing';
+  expect
+} from '@angular/core/testing';
+import { TestComponentBuilder } from '@angular/compiler/testing';
+
 import PhoneDetail from '../../app/js/phone_detail/phone_detail.component';
-import {Phones, Phone} from '../../app/js/core/phones.service';
+import { Phones, Phone } from '../../app/js/core/phones.service';
 
 function xyzPhoneData():Phone {
   return {
@@ -27,7 +26,7 @@ function xyzPhoneData():Phone {
 
 class MockPhones extends Phones {
   get(id):Observable<Phone> {
-    return Observable.fromArray([xyzPhoneData()]);
+    return Observable.of(xyzPhoneData());
   }
 }
 
@@ -41,7 +40,7 @@ describe('PhoneDetail', () => {
   ]);
   // #enddocregion routeparams
 
-  it('should fetch phone detail', injectAsync([TestComponentBuilder], (tcb) => {
+  it('should fetch phone detail', inject([TestComponentBuilder], (tcb) => {
     return tcb.createAsync(PhoneDetail).then((fixture) => {
       fixture.detectChanges();
       let compiled = fixture.debugElement.nativeElement;

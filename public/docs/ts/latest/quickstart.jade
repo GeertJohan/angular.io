@@ -89,7 +89,7 @@ a(id="typings")
   :marked
     Many JavaScript libraries extend the JavaScript environment with features and syntax
     that the TypeScript compiler doesn't recognize natively. We teach it about these capabilities with
-    <a href="http://www.typescriptlang.org/Handbook#writing-dts-files" target="_blank">TypeScript type definition files</a>
+    <a href="http://www.typescriptlang.org/docs/handbook/writing-declaration-files.html" target="_blank">TypeScript type definition files</a>
     &mdash; *d.ts files* &mdash; which we identify in a `typings.json` file.
     
     We go a little deeper into *typings* in the 
@@ -115,7 +115,7 @@ a(id="package-json")
 
   :marked
     We execute most npm scripts in the following way: `npm run` + *script-name*. 
-    Some commands (such as `start` don't require the `run` keyword).
+    Some commands (such as `start`) don't require the `run` keyword.
     
     Here's what these scripts do:
     
@@ -209,8 +209,8 @@ a(id="app-component")
     each made up of several, related features that we'll use to build our application.
     
     When we need something from a module, we import it. 
-    Here we import the Angular `Component` decorator function from the
-    main Angular library module because we need it to define our component.
+    Here we import the Angular `Component` decorator function from
+    `@angular/core` because we need it to define our component.
   +makeExample('quickstart/ts/app/app.component.ts', 'import', 'app/app.component.ts (import)')(format=".")
 
   a(id="component-decorator")
@@ -275,8 +275,8 @@ a(id="main")
     Then we call `bootstrap` with `AppComponent`.
  
     ### Bootstrapping is platform-specific
-    Notice that we import the `bootstrap` function from `angular2/platform/browser`,
-    not `angular2/core`.
+    Notice that we import the `bootstrap` function from `@angular/platform-browser-dynamic`,
+    not `@angular/core`.
     
     Bootstrapping isn't core because there isn't a single way to bootstrap the app.
     True, most applications that run in a browser call the bootstrap function from
@@ -323,7 +323,7 @@ code-example(format="").
     1. The JavaScript [libraries](#libraries)
     
     2. Configuration of [SystemJS](#systemjs) where we also import and run the
-    `main` file that we just wrote.
+    `main` file that we just wrote. //TODO reword this a bit
     
     3. The [&lt;my-app>](#my-app) tag in the `<body>` which is *where our app lives!*
     
@@ -337,21 +337,18 @@ code-example(format="").
     IE requires polyfills to run
     an application that relies on ES2015 promises and dynamic module loading.
     Most applications need those capabilities and most applications
-    should run in Internet Explorer.
+    should run in Internet Explorer. //TODO es6-shim are not IE polyfills or they are?
 
-    Next are the polyfills for Angular2, `angular2-polyfills.js`.
+    Next are the polyfills for Angular2, `zone.js` and `reflect-metadata`.
     
-    Then the [SystemJS](#systemjs) library for module loading,
-    followed by the Reactive Extensions RxJS library.
+    Then the [SystemJS](#systemjs) library for module loading.
   .l-sub-section
     :marked
       Our QuickStart doesn't use the Reactive Extensions 
       but any substantial application will want them
       when working with observables.
-      We added the library here in QuickStart so we don't forget later.
+      We added the library here in QuickStart so we don't forget later.//TODO this subsection needs to be moved for when we cover the systemjs.config.js
   :marked
-    Finally, we loaded the web development version of Angular 2 itself.
-
     We'll make different choices as we gain experience and
     become more concerned about production qualities such as
     load times and memory footprint.
@@ -375,11 +372,8 @@ code-example(format="").
     <a href="https://github.com/systemjs/systemjs/blob/master/docs/config-api.md" target="_blank">here</a>.
 
     With those cautions in mind, what are we doing in this QuickStart configuration?
-  +makeExample('quickstart/ts/index.html', 'systemjs', 'index.html (System configuration)')(format=".")
+  +makeExample('quickstart/ts/systemjs.config.1.js', null, 'systemjs.config.js')(format=".")
   :marked
-    The `packages` node tells SystemJS what to do when it sees a request for a 
-    module from the `app/` folder. 
-    
     Our QuickStart makes such requests when one of its
     application TypeScript files has an import statement like this:
   +makeExample('quickstart/ts/app/main.ts', 'app-component', 'main.ts (excerpt)')(format=".")
@@ -481,14 +475,19 @@ figure.image-display
       .file app.component.ts
       .file main.ts
     .file node_modules ...
-    .file typings ...
+    .file typings    
+    .children
+      .file typings.d.ts
+      .file ...
     .file index.html
     .file package.json
     .file styles.css
+    .file system.config.js
     .file tsconfig.json
     .file typings.json
 :marked
-  And here are the files:
+  And here are the files:,
+    quickstart/ts/typings/typings.d.1.ts
 +makeTabs(`
     quickstart/ts/app/app.component.ts,
     quickstart/ts/app/main.ts,
@@ -496,14 +495,17 @@ figure.image-display
     quickstart/ts/package.1.json,
     quickstart/ts/tsconfig.1.json,
     quickstart/ts/typings.1.json,
-    quickstart/ts/styles.1.css    
-  `,null,
+    quickstart/ts/styles.1.css,
+    quickstart/ts/system.config.1.js`
+  ,null,
   `app/app.component.ts, 
   app/main.ts, 
-  index.html,package.json, 
+  index.html,
+  package.json, 
   tsconfig.json, 
   typings.json,
-  styles.css`)
+  styles.css,
+  system.config.js`)
 :marked
 
 .l-main-section

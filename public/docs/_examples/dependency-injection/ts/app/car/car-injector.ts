@@ -1,9 +1,9 @@
 // #docplaster
 //#docregion
-import { ReflectiveInjector }         from 'angular2/core';
+import { ReflectiveInjector }         from '@angular/core';
 
-import {Car, Engine, Tires} from './car';
-import {Logger}             from '../logger.service';
+import { Car, Engine, Tires } from './car';
+import { Logger }             from '../logger.service';
 
 //#docregion injector
 export function useInjector() {

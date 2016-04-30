@@ -1,6 +1,6 @@
 // #docplaster
 // #docregion
-import {Component,  AfterContentChecked, AfterContentInit, ContentChild} from 'angular2/core';
+import { AfterContentChecked, AfterContentInit, Component, ContentChild } from '@angular/core';
 
 import {LoggerService}  from './logger.service';
 
@@ -17,7 +17,7 @@ export class ChildComponent {
 @Component({
   selector: 'after-content',
 // #docregion template
-  template:`
+  template: `
     <div>-- projected content begins --</div>
       <ng-content></ng-content>
     <div>-- projected content ends --</div>`
@@ -29,49 +29,49 @@ export class ChildComponent {
   `
 })
 // #docregion hooks
-export class AfterContentComponent implements  AfterContentChecked, AfterContentInit {
-  private _prevHero = '';
+export class AfterContentComponent implements AfterContentChecked, AfterContentInit {
+  private prevHero = '';
+  comment = '';
 
   // Query for a CONTENT child of type `ChildComponent`
   @ContentChild(ChildComponent) contentChild: ChildComponent;
 
 // #enddocregion hooks
-  constructor(private _logger:LoggerService){
-    this._logIt('AfterContent constructor');
+  constructor(private logger: LoggerService) {
+    this.logIt('AfterContent constructor');
   }
 
 // #docregion hooks
   ngAfterContentInit() {
     // viewChild is set after the view has been initialized
-    this._logIt('AfterContentInit');
-    this._doSomething();
+    this.logIt('AfterContentInit');
+    this.doSomething();
   }
 
   ngAfterContentChecked() {
     // viewChild is updated after the view has been checked
-    if (this._prevHero === this.contentChild.hero) {
-      this._logIt('AfterContentChecked (no change)');
+    if (this.prevHero === this.contentChild.hero) {
+      this.logIt('AfterContentChecked (no change)');
     } else {
-      this._prevHero = this.contentChild.hero;
-      this._logIt('AfterContentChecked');
-      this._doSomething();
+      this.prevHero = this.contentChild.hero;
+      this.logIt('AfterContentChecked');
+      this.doSomething();
     }
   }
 // #enddocregion hooks
 
-  comment = '';
 
 // #docregion do-something
 
   // This surrogate for real business logic sets the `comment`
-  private _doSomething() {
-    this.comment = this.contentChild.hero.length > 10 ? "That's a long name" : '';
+  private doSomething() {
+    this.comment = this.contentChild.hero.length > 10 ? 'That\'s a long name' : '';
   }
 
-  private _logIt(method:string){
+  private logIt(method: string) {
     let vc = this.contentChild;
-    let message = `${method}: ${vc ? vc.hero:'no'} child view`
-    this._logger.log(message);
+    let message = `${method}: ${vc ? vc.hero : 'no'} child view`;
+    this.logger.log(message);
   }
 // #docregion hooks
   // ...
@@ -99,21 +99,21 @@ export class AfterContentComponent implements  AfterContentChecked, AfterContent
   </div>
   `,
   styles: ['.parent {background: burlywood}'],
-  providers:[LoggerService],
+  providers: [LoggerService],
   directives: [AfterContentComponent, ChildComponent]
 })
 export class AfterContentParentComponent {
-  logs:string[];
+  logs: string[];
   show = true;
 
-  constructor(logger:LoggerService){
+  constructor(logger: LoggerService) {
     this.logs = logger.logs;
   }
 
   reset() {
-    this.logs.length=0;
+    this.logs.length = 0;
     // quickly remove and reload AfterContentComponent which recreates it
     this.show = false;
-    setTimeout(() => this.show = true, 0)
+    setTimeout(() => this.show = true, 0);
   }
 }
