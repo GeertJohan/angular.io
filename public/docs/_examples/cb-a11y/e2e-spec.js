@@ -76,7 +76,7 @@ describe('A11y Cookbook', function () {
     });
 
     it('should have the correct page heading', function () {
-      expect(element(by.tagName('h2')).getText()).toBe('Accessible form control labels', 'Page heading not correct');
+      testTag('h2', 'Accessible form control labels', 'Page heading not correct');
     });
 
     it('should have the correct sections', function () {
@@ -262,7 +262,7 @@ describe('A11y Cookbook', function () {
     });
 
     it('should have the correct page heading', function () {
-      expect(element(by.tagName('h2')).getText()).toBe('Managing focus', 'Page heading not correct');
+      testTag('h2', 'Managing focus', 'Page heading not correct');
     });
 
     it('should have the correct sections', function () {
@@ -324,7 +324,7 @@ describe('A11y Cookbook', function () {
     });
 
     it('should have the correct page heading', function () {
-      expect(element(by.tagName('h2')).getText()).toBe('Roles for custom component widgets', 'Page heading not correct');
+      testTag('h2', 'Roles for custom component widgets', 'Page heading not correct');
     });
 
     it('should have the correct sections', function () {
@@ -354,6 +354,58 @@ describe('A11y Cookbook', function () {
       element.all(by.css('a11y-custom-button[role="button"]')).get(0).click().then(function () {
         testValueDecorator(1, 'Button has been clicked 1 times');
       });
+    });
+
+  });
+
+  describe('A11y Cookbook a11y errors page', function () {
+
+    beforeAll(function () {
+      browser.get('');
+      var labelLink = element.all(by.tagName('a')).get(3);
+      labelLink.click().then(function () {
+        labelLink = element.all(by.tagName('a')).get(0);
+        labelLink.click();
+      });
+
+    });
+
+    it('should have the correct page heading', function () {
+      testTag('h3', 'Demo with a11y errors', 'Page heading not correct');
+    });
+
+    it('should have the required form elements', function () {
+      testDemoPageLabels();
+    });
+
+    it('should have basic form functionality', function () {
+      testDemoPageFunction();
+    });
+
+  });
+
+  describe('A11y Cookbook a11y features page', function () {
+
+    beforeAll(function () {
+      browser.get('');
+      var labelLink = element.all(by.tagName('a')).get(3);
+      labelLink.click().then(function () {
+        labelLink = element.all(by.tagName('a')).get(1);
+        labelLink.click();
+      });
+
+    });
+
+    it('should have the correct page heading', function () {
+      testTag('h2', 'Demo with full a11y features', 'Page heading not correct');
+    });
+
+    it('should have the required form elements', function () {
+      testDemoPageLabels();
+    });
+
+    it('should have basic form functionality', function () {
+      testDemoPageFunction();
     });
 
   });
@@ -390,6 +442,29 @@ describe('A11y Cookbook', function () {
   function testValueDecorator(index, contentText) {
     element.all(by.css('a11y-value-helper span')).get(index).getText().then(function (valueText) {
       expect(valueText).toBe('Current value: ' + contentText, 'Incorrect value decorator value');
+    });
+  }
+
+  function testDemoPageLabels() {
+    testElementWithText('label', 'Your name:', 'Name input not present');
+    testElementWithText('label', 'Your surname:', 'Surname input not present');
+    testElementWithText('label', 'Tell us why you love Angular:', 'Angular reason inut not present');
+    testElementWithText('button', 'Submit', 'Angular reason inut not present');
+  }
+
+  function testDemoPageFunction() {
+    var statusBanner = element(by.css('div.alert.alert-success'));
+    var submitButton = element(by.css('button.btn.btn-primary'));
+    expect(statusBanner.isDisplayed()).toBeFalsy('Status banner should not be shown initially');
+    var nameInput = element.all(by.css('input')).get(0);
+    sendKeys(nameInput, 'John');
+    var surnameInput = element.all(by.css('input')).get(1);
+    sendKeys(surnameInput, 'Smith');
+    var reasonInput = element.all(by.css('input')).get(2);
+    sendKeys(reasonInput, 'It is awesome!!');
+    submitButton.click().then(function () {
+      expect(statusBanner.isDisplayed()).toBeTruthy('Status banner should be shown after submit');
+      testElementWithText('div.alert.alert-success', 'Hi John Smith! Your reason for liking Angular 2 is: It is awesome!!.', 'Banner should be correctly described')
     });
   }
 
